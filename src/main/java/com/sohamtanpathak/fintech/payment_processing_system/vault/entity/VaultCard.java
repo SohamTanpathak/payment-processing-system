@@ -1,0 +1,41 @@
+package com.sohamtanpathak.fintech.payment_processing_system.vault.entity;
+
+import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Entity
+@Table(name = "vault_card")
+public class VaultCard {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(nullable = false, length = 4)
+    private String lastFour;
+
+    @Column(nullable = false, length = 6)
+    private String bin; // brand(of card) identification number (first six digits of card)
+
+    @Column(nullable = false)
+    private byte[] encryptedPan; //PAN no. encrypted and stored in DB
+
+    @Column(nullable = false)
+    private byte[] encryptedDek; //Dek is the string that is used to encrypt the PAN
+
+    @Column(nullable = false)
+    private String brand;  // VISA, RUPAY, etc
+
+    @Column(nullable = false)
+    private String expiryMonth;
+
+    @Column(nullable = false)
+    private String expiryYear;
+
+    @Column(nullable = false)
+    private String cardHolderName;
+
+    private LocalDateTime deletedAt;
+}
