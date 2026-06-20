@@ -8,7 +8,7 @@ spring:
     #DB url, username and password are stored in Env variables under Configurations of this project
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:

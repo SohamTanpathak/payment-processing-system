@@ -2,6 +2,7 @@ package com.sohamtanpathak.fintech.payment_processing_system.merchant.entity;
 
 import com.sohamtanpathak.fintech.payment_processing_system.common.enums.UserRole;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -12,6 +13,11 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "app_user")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class AppUser {
 
     @Id
