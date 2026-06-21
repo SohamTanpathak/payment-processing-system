@@ -7,6 +7,7 @@ import com.sohamtanpathak.fintech.payment_processing_system.merchant.dto.request
 import com.sohamtanpathak.fintech.payment_processing_system.merchant.dto.response.MerchantResponse;
 import com.sohamtanpathak.fintech.payment_processing_system.merchant.entity.AppUser;
 import com.sohamtanpathak.fintech.payment_processing_system.merchant.entity.Merchant;
+import com.sohamtanpathak.fintech.payment_processing_system.merchant.mapper.MerchantMapper;
 import com.sohamtanpathak.fintech.payment_processing_system.merchant.repository.AppUserRepository;
 import com.sohamtanpathak.fintech.payment_processing_system.merchant.repository.MerchantRepository;
 import com.sohamtanpathak.fintech.payment_processing_system.merchant.service.AuthService;
@@ -23,6 +24,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final AppUserRepository appUserRepository;
     private final MerchantRepository merchantRepository;
+    private final MerchantMapper merchantMapper;
 
     @Override
     @Transactional
@@ -33,13 +35,8 @@ public class AuthServiceImpl implements AuthService {
                     "Merchant with email already exists: "+ request.email());
         }
 
-        Merchant merchant = Merchant.builder()
-                .businessName(request.businessName())
-                .businessType(request.businessType())
-                .name(request.name())
-                .email(request.email())
-                .status(MerchantStatus.PENDING_KYC)
-                .build();
+        Merchant merchant = merchantMapper.toEntityFromSignUpRequest(request);
+        merchant.setStatus(MerchantStatus.PENDING_KYC);
 
         merchant = merchantRepository.save(merchant);
 
@@ -54,9 +51,7 @@ public class AuthServiceImpl implements AuthService {
                 .build();
         appUserRepository.save(appUser);
 
-        return new MerchantResponse(merchant.getId(), merchant.getName(),
-                merchant.getEmail(), merchant.getBusinessName(),
-                merchant.getBusinessType(), merchant.getStatus());
+        return merchantMapper.toResponse(merchant);
     }
 }
 

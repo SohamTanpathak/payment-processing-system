@@ -1,5 +1,6 @@
 package com.sohamtanpathak.fintech.payment_processing_system.vault.entity;
 
+import com.sohamtanpathak.fintech.payment_processing_system.common.entity.BaseEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -16,7 +17,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "card_token")
-public class CardToken {
+public class CardToken extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

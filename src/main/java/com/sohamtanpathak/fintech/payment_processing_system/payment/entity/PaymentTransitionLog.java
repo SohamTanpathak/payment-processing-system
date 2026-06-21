@@ -1,9 +1,11 @@
 package com.sohamtanpathak.fintech.payment_processing_system.payment.entity;
 
+import com.sohamtanpathak.fintech.payment_processing_system.common.entity.BaseEntity;
 import com.sohamtanpathak.fintech.payment_processing_system.common.enums.PaymentActor;
 import com.sohamtanpathak.fintech.payment_processing_system.common.enums.PaymentEvent;
 import com.sohamtanpathak.fintech.payment_processing_system.common.enums.PaymentStatus;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -14,8 +16,15 @@ import java.util.UUID;
  */
 
 @Entity
-@Table(name = "payment_transition_log")
-public class PaymentTransitionLog {
+@Table(name = "payment_transition_log", indexes = {
+        @Index(name = "idx_payment_transition_log_payment_id", columnList = "payment_id")
+})
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class PaymentTransitionLog extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

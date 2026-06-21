@@ -1,5 +1,6 @@
 package com.sohamtanpathak.fintech.payment_processing_system.operations.entity;
 
+import com.sohamtanpathak.fintech.payment_processing_system.common.entity.BaseEntity;
 import com.sohamtanpathak.fintech.payment_processing_system.common.entity.Money;
 import com.sohamtanpathak.fintech.payment_processing_system.common.enums.SettlementStatus;
 import jakarta.persistence.*;
@@ -17,7 +18,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "settlement")
-public class Settlement {
+public class Settlement extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

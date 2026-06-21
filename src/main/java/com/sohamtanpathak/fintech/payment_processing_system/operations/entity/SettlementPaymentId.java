@@ -1,5 +1,6 @@
 package com.sohamtanpathak.fintech.payment_processing_system.operations.entity;
 
+import com.sohamtanpathak.fintech.payment_processing_system.common.entity.BaseEntity;
 import jakarta.persistence.Embeddable;
 
 import java.util.UUID;
@@ -9,7 +10,7 @@ import java.util.UUID;
  * */
 
 @Embeddable
-public class SettlementPaymentId {
+public class SettlementPaymentId extends BaseEntity {
 
     private UUID settlementId;
 

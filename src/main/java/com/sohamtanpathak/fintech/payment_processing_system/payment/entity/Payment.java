@@ -1,9 +1,11 @@
 package com.sohamtanpathak.fintech.payment_processing_system.payment.entity;
 
+import com.sohamtanpathak.fintech.payment_processing_system.common.entity.BaseEntity;
 import com.sohamtanpathak.fintech.payment_processing_system.common.entity.Money;
 import com.sohamtanpathak.fintech.payment_processing_system.common.enums.PaymentMethod;
 import com.sohamtanpathak.fintech.payment_processing_system.common.enums.PaymentStatus;
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -12,8 +14,16 @@ import java.util.Map;
 import java.util.UUID;
 
 @Entity
-@Table(name = "payment")
-public class Payment {
+@Table(name = "payment", indexes = {
+        @Index(name = "idx_payment_order_id", columnList = "order_id"),
+        @Index(name = "idx_order_merchant_id", columnList = "merchant_id")
+})
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class Payment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
