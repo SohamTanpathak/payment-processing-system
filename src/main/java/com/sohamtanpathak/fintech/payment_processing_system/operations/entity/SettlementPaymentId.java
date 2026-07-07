@@ -10,7 +10,7 @@ import java.util.UUID;
  * */
 
 @Embeddable
-public class SettlementPaymentId extends BaseEntity {
+public class SettlementPaymentId {
 
     private UUID settlementId;
 

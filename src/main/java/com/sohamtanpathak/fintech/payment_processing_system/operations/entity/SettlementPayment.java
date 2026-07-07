@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "settlement_payment")
-public class SettlementPayment {
+public class SettlementPayment extends BaseEntity{
 
     @EmbeddedId     //@EmbeddedId is used when you are trying to create an Id which contains composite key
     private SettlementPaymentId id;
