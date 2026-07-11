@@ -1,6 +1,7 @@
 package com.sohamtanpathak.fintech.payment_processing_system.payment.service.impl;
 
 import com.sohamtanpathak.fintech.payment_processing_system.common.enums.OrderStatus;
+import com.sohamtanpathak.fintech.payment_processing_system.common.enums.PaymentEvent;
 import com.sohamtanpathak.fintech.payment_processing_system.common.enums.PaymentStatus;
 import com.sohamtanpathak.fintech.payment_processing_system.common.exceptions.BusinessRuleViolationException;
 import com.sohamtanpathak.fintech.payment_processing_system.common.exceptions.ResourceNotFoundException;
@@ -15,11 +16,13 @@ import com.sohamtanpathak.fintech.payment_processing_system.payment.mapper.Payme
 import com.sohamtanpathak.fintech.payment_processing_system.payment.repository.OrderRepository;
 import com.sohamtanpathak.fintech.payment_processing_system.payment.repository.PaymentRepository;
 import com.sohamtanpathak.fintech.payment_processing_system.payment.service.PaymentService;
+import com.sohamtanpathak.fintech.payment_processing_system.payment.statemachine.PaymentTransitionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -31,6 +34,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentGatewayRouter paymentGatewayRouter;
     private final PaymentMapper paymentMapper;
+    private final PaymentTransitionService paymentTransitionService;
 
     @Override
     @Transactional
@@ -61,20 +65,59 @@ public class PaymentServiceImpl implements PaymentService {
 
         payment = paymentRepository.save(payment);
 
-        PaymentRequest paymentRequest = new PaymentRequest(payment.getId(), request.orderId(), merchantId, order.getAmount(), request.method(), request.methodDetails());
+        PaymentRequest paymentRequest = new PaymentRequest(payment.getId(),
+                request.orderId(), merchantId,
+                order.getAmount(), request.method(),
+                request.methodDetails());
         PaymentResult result = paymentGatewayRouter.initiate(paymentRequest);
 
         switch (result) {
             case PaymentResult.Pending pending -> payment.setPreocessorReference(pending.registrationReference());
             case PaymentResult.Failure failure -> {
-                payment.setStatus(PaymentStatus.FAILED);
+//                payment.setStatus(PaymentStatus.FAILED); (done via statemachine, refer below line)
+                paymentTransitionService.apply(payment, PaymentEvent.AUTHORIZE_FAIL);
                 payment.setErrorCode(failure.errorCode());
                 payment.setErrorDescription(failure.errorDescription());
+            }
+            case PaymentResult.Success success -> {
             }
         }
 
         payment = paymentRepository.save(payment);
         orderRepository.save(order);
+        
+        // TODO: send an outbox (kafka event)
+
+        return paymentMapper.toResponse(payment);
+    }
+
+    @Override
+    public PaymentResponse capture(UUID merchantId, UUID paymentId) {
+
+        Payment payment = paymentRepository.findByIdAndMerchantId(paymentId, merchantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Payment", paymentId));
+
+//        payment.setStatus(PaymentStatus.CAPTURING); (done via statemachine, refer below line)
+        paymentTransitionService.apply(payment, PaymentEvent.CAPTURE_REQUEST);
+
+        PaymentResult paymentResult = paymentGatewayRouter.capture(payment.getMethod(), payment.getId());
+
+        if(paymentResult instanceof PaymentResult.Success success){
+//            payment.setStatus(PaymentStatus.CAPTURED); (done via statemachine, refer below line)
+            paymentTransitionService.apply(payment, PaymentEvent.CAPTURE_SUCCESS);
+            payment.setCapturedAt(LocalDateTime.now());
+            log.info("Payment captured, paymentId: {}", paymentId);
+        } else if(paymentResult instanceof PaymentResult.Failure failure){
+//            payment.setStatus(PaymentStatus.AUTHORIZED); (done via statemachine, refer below line)
+            paymentTransitionService.apply(payment, PaymentEvent.CAPTURE_FAIL);
+            payment.setErrorCode(failure.errorCode());
+            payment.setErrorDescription(failure.errorDescription());
+            log.warn("Payment captured failed, paymentId: {}",paymentId);
+        }
+
+        payment = paymentRepository.save(payment);
+
+        // TODO: send an outbox (kafka event)
 
         return paymentMapper.toResponse(payment);
     }
