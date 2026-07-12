@@ -29,8 +29,8 @@ public class NetBankingPaymentProcessor implements PaymentProcessor {
 
         //Bank gives it to us so we can redirect client to this link and there theyt make the payment, eg: ICICI bank link or Canara bank link
         // once the payment is done on the bank side, the bank will notify us via the webhook
-        String redirectRef = "http://REDIRECT_BANK.com/"+processorRef;
+//        String redirectRef = "http://REDIRECT_BANK.com/"+processorRef;
 
-        return new PaymentProcessorResponse.Success(processorRef, redirectRef);
+        return new PaymentProcessorResponse.Pending(processorRef);
     }
 }

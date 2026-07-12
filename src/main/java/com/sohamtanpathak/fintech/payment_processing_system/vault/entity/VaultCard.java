@@ -1,13 +1,20 @@
 package com.sohamtanpathak.fintech.payment_processing_system.vault.entity;
 
 import com.sohamtanpathak.fintech.payment_processing_system.common.entity.BaseEntity;
+import com.sohamtanpathak.fintech.payment_processing_system.common.enums.CardBrand;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "vault_card")
+@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class VaultCard extends BaseEntity {
 
     @Id
@@ -27,7 +34,7 @@ public class VaultCard extends BaseEntity {
     private byte[] encryptedDek; //Dek is the string that is used to encrypt the PAN
 
     @Column(nullable = false)
-    private String brand;  // VISA, RUPAY, etc
+    private CardBrand brand;  // VISA, RUPAY, etc
 
     @Column(nullable = false)
     private String expiryMonth;

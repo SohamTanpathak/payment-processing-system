@@ -2,6 +2,7 @@ package com.sohamtanpathak.fintech.payment_processing_system.vault.entity;
 
 import com.sohamtanpathak.fintech.payment_processing_system.common.entity.BaseEntity;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -17,6 +18,11 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "card_token")
+@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class CardToken extends BaseEntity {
 
     @Id
