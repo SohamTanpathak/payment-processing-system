@@ -25,10 +25,7 @@ public class PaymentGatewayRouter {
         if(adapter == null)
             throw new IllegalArgumentException("No payment adapter registered for method: "+ request.method());
 
-
         return adapter.initiate(request);
-
-
     }
 
     public PaymentResult capture(PaymentMethod method, UUID paymentId) {

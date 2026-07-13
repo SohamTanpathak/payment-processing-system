@@ -23,6 +23,9 @@ public class CardPaymentAdapter implements PaymentAdapter {
 
         String token = (String) request.methodDetails().get("token");
 
+        /*
+          Only vault service has the access to te real pan, so we call vaultService
+        */
         PaymentProcessorResponse response = vaultService.charge(
             request.paymentId(), token, request.amount(), request.methodDetails()
         );
@@ -35,6 +38,6 @@ public class CardPaymentAdapter implements PaymentAdapter {
 
     @Override
     public PaymentResult capture(UUID paymentId) {
-        return null;
+        return new PaymentResult.Success("CARD_REF");
     }
 }

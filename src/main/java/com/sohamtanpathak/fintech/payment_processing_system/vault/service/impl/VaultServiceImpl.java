@@ -93,10 +93,12 @@ public class VaultServiceImpl implements VaultService {
         CardToken cardToken = cardTokenRepository.findByTokenAndRevokedAtIsNull(token)
                 .orElseThrow(() -> new ResourceNotFoundException("CardToken", token));
 
+        // get the actual vault card from the cardToken, this vault card has encrypted pan which needs to be decrypted
         VaultCard vaultCard = cardToken.getVaultCard();
         byte[] panBytes = null;
 
         try {
+            // for decrypting the pan, firstly need to decrypt the dek
             byte[] dek = dekEncrypter.decrypt(vaultCard.getEncryptedDek()); //decrypt the dek
             panBytes = VaultEncryptionConfig.panEncryptor(dek).decrypt(vaultCard.getEncryptedPan()); //decrypt the pan
 
